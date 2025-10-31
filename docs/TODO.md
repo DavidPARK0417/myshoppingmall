@@ -12,33 +12,33 @@
   - [x] 샘플 데이터 삽입 (20개)
 - [x] Clerk 연동 (회원가입/로그인)
 - [x] 기본 레이아웃 및 라우팅
-- [ ] 프로젝트 메타데이터 파일 추가
-  - [ ] `app/not-found.tsx` 파일
-  - [ ] `app/robots.ts` 파일
-  - [ ] `app/sitemap.ts` 파일
-  - [ ] `app/manifest.ts` 파일
+- [x] 프로젝트 메타데이터 파일 추가
+  - [x] `app/not-found.tsx` 파일
+  - [x] `app/robots.ts` 파일
+  - [x] `app/sitemap.ts` 파일
+  - [x] `app/manifest.ts` 파일
 
 ## Phase 2: 상품 기능 (1주)
 
-- [ ] 홈페이지
-  - [ ] 상품 목록 표시 (인기 상품, 신상품 등)
-  - [ ] 카테고리별 섹션 구성
-- [ ] 상품 목록 페이지 (`app/products/page.tsx`)
-  - [ ] 페이지네이션 구현
-  - [ ] 무한 스크롤 또는 페이지 번호 방식
-- [ ] 카테고리 필터링
-  - [ ] 카테고리별 필터 UI (`components/product-category-filter.tsx`)
-  - [ ] 필터 적용 기능 (electronics, clothing, books, food, sports, beauty, home)
+- [x] 홈페이지
+  - [x] 상품 목록 표시 (인기 상품, 신상품 등)
+  - [x] 카테고리별 섹션 구성
+- [x] 상품 목록 페이지 (`app/products/page.tsx`)
+  - [x] 페이지네이션 구현
+  - [x] 페이지 번호 방식
+- [x] 카테고리 필터링
+  - [x] 카테고리별 필터 UI (`components/product-category-filter.tsx`)
+  - [x] 필터 적용 기능 (electronics, clothing, books, food, sports, beauty, home)
 - [ ] 상품 상세 페이지 (`app/products/[id]/page.tsx`)
   - [ ] 상품 정보 표시
   - [ ] 수량 선택 기능
   - [ ] 장바구니 추가 버튼
 - [ ] 어드민 상품 등록
   - [ ] 참고: Supabase 대시보드에서 직접 등록 (MVP에서는 어드민 기능 제외)
-- [ ] Server Actions 구현 (`actions/products.ts`)
-  - [ ] `getProducts()` - 상품 목록 조회
-  - [ ] `getProductById(id)` - 상품 상세 조회
-  - [ ] `getProductsByCategory(category)` - 카테고리별 조회
+- [x] Server Actions 구현 (`actions/products.ts`)
+  - [x] `getProducts()` - 상품 목록 조회
+  - [x] `getProductById(id)` - 상품 상세 조회
+  - [x] `getProductsByCategory(category)` - 카테고리별 조회
 
 ## Phase 3: 장바구니 & 주문 (1주)
 

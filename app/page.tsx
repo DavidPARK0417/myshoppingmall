@@ -1,41 +1,114 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { RiSupabaseFill } from "react-icons/ri";
+import {
+  getFeaturedProducts,
+  getProductsByCategory,
+} from "@/actions/products";
+import ProductList from "@/components/product-list";
+import { getCategoryLabel, getFeaturedCategories } from "@/lib/categories";
 
-export default function Home() {
+/**
+ * @file page.tsx
+ * @description 홈페이지
+ *
+ * 인기 상품 및 카테고리별 상품 섹션을 표시하는 홈페이지입니다.
+ * Server Component로 구현하여 데이터를 서버에서 조회합니다.
+ */
+
+export default async function Home() {
+  console.log("[home] 홈페이지 렌더링 시작");
+
+  // 병렬로 데이터 조회
+  const [featuredProducts, ...categoryProducts] = await Promise.all([
+    getFeaturedProducts(8),
+    ...getFeaturedCategories().map((category) =>
+      getProductsByCategory(category, 4),
+    ),
+  ]);
+
+  const categories = getFeaturedCategories();
+
+  console.log("[home] 홈페이지 데이터 로드 완료", {
+    featuredCount: featuredProducts.length,
+    categoryCounts: categoryProducts.map((products, i) => ({
+      category: categories[i],
+      count: products.length,
+    })),
+  });
+
   return (
-    <main className="min-h-[calc(100vh-80px)] flex items-center px-8 py-16 lg:py-24">
-      <section className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start lg:items-center">
-        {/* 좌측: 환영 메시지 */}
-        <div className="flex flex-col gap-8">
-          <h1 className="text-5xl lg:text-7xl font-bold leading-tight">
-            SaaS 앱 템플릿에 오신 것을 환영합니다
+    <main className="min-h-[calc(100vh-80px)] px-8 py-16 lg:py-24">
+      <div className="w-full max-w-7xl mx-auto flex flex-col gap-16">
+        {/* 히어로 섹션 */}
+        <section className="text-center py-8">
+          <h1 className="text-4xl lg:text-6xl font-bold leading-tight mb-4">
+            쇼핑몰에 오신 것을 환영합니다
           </h1>
-          <p className="text-xl lg:text-2xl text-gray-600 dark:text-gray-400 leading-relaxed">
-            Next.js, Shadcn, Clerk, Supabase, TailwindCSS로 구동되는 완전한
-            기능의 템플릿으로 다음 프로젝트를 시작하세요.
+          <p className="text-xl lg:text-2xl text-gray-600 dark:text-gray-400">
+            최신 상품을 만나보세요
           </p>
-        </div>
+        </section>
 
-        {/* 우측: 버튼 두 개 세로 정렬 */}
-        <div className="flex flex-col gap-6">
-          <Link href="/storage-test" className="w-full">
-            <Button className="w-full h-28 flex items-center justify-center gap-4 text-xl shadow-lg hover:shadow-xl transition-shadow">
-              <RiSupabaseFill className="w-8 h-8" />
-              <span>Storage 파일 업로드 테스트</span>
-            </Button>
-          </Link>
-          <Link href="/auth-test" className="w-full">
-            <Button
-              className="w-full h-28 flex items-center justify-center gap-4 text-xl shadow-lg hover:shadow-xl transition-shadow"
-              variant="outline"
-            >
-              <RiSupabaseFill className="w-8 h-8" />
-              <span>Clerk + Supabase 인증 연동</span>
-            </Button>
-          </Link>
-        </div>
-      </section>
+        {/* 인기 상품 섹션 */}
+        <section className="flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl lg:text-3xl font-bold">인기 상품</h2>
+            <Link href="/products">
+              <Button variant="outline" size="sm">
+                더보기
+              </Button>
+            </Link>
+          </div>
+          <ProductList products={featuredProducts} />
+        </section>
+
+        {/* 카테고리별 섹션 */}
+        {categories.map((category, index) => {
+          const products = categoryProducts[index];
+          if (!products || products.length === 0) return null;
+
+          return (
+            <section key={category} className="flex flex-col gap-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl lg:text-3xl font-bold">
+                  {getCategoryLabel(category)}
+                </h2>
+                <Link href={`/products?category=${category}`}>
+                  <Button variant="outline" size="sm">
+                    더보기
+                  </Button>
+                </Link>
+              </div>
+              <ProductList products={products} />
+            </section>
+          );
+        })}
+
+        {/* 테스트 페이지 섹션 (하단으로 이동) */}
+        <section className="border-t pt-16 mt-8">
+          <h2 className="text-2xl font-bold mb-6 text-center">
+            개발 테스트 페이지
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            <Link href="/storage-test" className="w-full">
+              <Button className="w-full h-20 flex items-center justify-center gap-4 text-lg shadow-lg hover:shadow-xl transition-shadow">
+                <RiSupabaseFill className="w-6 h-6" />
+                <span>Storage 파일 업로드 테스트</span>
+              </Button>
+            </Link>
+            <Link href="/auth-test" className="w-full">
+              <Button
+                className="w-full h-20 flex items-center justify-center gap-4 text-lg shadow-lg hover:shadow-xl transition-shadow"
+                variant="outline"
+              >
+                <RiSupabaseFill className="w-6 h-6" />
+                <span>Clerk + Supabase 인증 연동</span>
+              </Button>
+            </Link>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
