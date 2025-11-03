@@ -24,11 +24,45 @@
   - [x] 상품 목록 표시 (인기 상품, 신상품 등)
   - [x] 카테고리별 섹션 구성
 - [x] 상품 목록 페이지 (`app/products/page.tsx`)
+  - [x] 페이지 기본 구조 및 레이아웃
+    - [x] 헤더 영역 (제목, 총 상품 개수 표시)
+    - [x] 카테고리 필터 영역
+    - [x] 상품 목록 표시 영역
+    - [x] 페이지네이션 영역
   - [x] 페이지네이션 구현
-  - [x] 페이지 번호 방식
+    - [x] 페이지 번호 방식 (현재 페이지 주변 2페이지만 표시)
+    - [x] 이전/다음 버튼
+    - [x] 생략 표시 (ellipsis) 처리
+    - [x] 카테고리 필터와 페이지네이션 연동
+  - [x] 카테고리 필터 연동
+    - [x] URL 쿼리 파라미터로 카테고리 전달
+    - [x] 필터 변경 시 첫 페이지로 이동
+  - [x] Server Component 구현
+    - [x] `searchParams` 비동기 처리 (Next.js 15)
+    - [x] 병렬 데이터 조회 (`Promise.all`)
+    - [x] 로깅 추가 (개발 환경 디버깅용)
+  - [x] UI 컴포넌트 통합
+    - [x] `ProductList` 컴포넌트 사용
+    - [x] `ProductCategoryFilter` 컴포넌트 사용 (Suspense 래핑)
+    - [x] 빈 상태 메시지 처리
 - [x] 카테고리 필터링
   - [x] 카테고리별 필터 UI (`components/product-category-filter.tsx`)
+    - [x] 전체/카테고리 버튼 UI
+    - [x] 선택된 카테고리 강조 표시
+    - [x] URL 쿼리 파라미터 기반 필터링
+    - [x] 홈페이지/상품 목록 페이지 모두 지원 (basePath prop)
+    - [x] 홈페이지에서 필터 클릭 시 스크롤 처리
   - [x] 필터 적용 기능 (electronics, clothing, books, food, sports, beauty, home)
+- [x] 상품 목록 UI 컴포넌트 (`components/product-list.tsx`)
+  - [x] 반응형 그리드 레이아웃 (1열 → 2열 → 3열 → 4열)
+  - [x] 빈 상태 메시지 표시
+  - [x] ProductCard 컴포넌트 통합
+- [x] 상품 카드 컴포넌트 (`components/product-card.tsx`)
+  - [x] 상품 이미지 표시
+  - [x] 상품명, 가격, 재고 상태 표시
+  - [x] 상품 상세 페이지 링크
+  - [x] 가격 포맷팅 (천 단위 구분)
+  - [x] 재고 상태 표시 (재고 있음/부족/품절)
 - [ ] 상품 상세 페이지 (`app/products/[id]/page.tsx`)
   - [ ] 상품 정보 표시
   - [ ] 수량 선택 기능
@@ -37,8 +71,24 @@
   - [ ] 참고: Supabase 대시보드에서 직접 등록 (MVP에서는 어드민 기능 제외)
 - [x] Server Actions 구현 (`actions/products.ts`)
   - [x] `getProducts()` - 상품 목록 조회
-  - [x] `getProductById(id)` - 상품 상세 조회
+    - [x] 카테고리 필터링 지원 (선택사항)
+    - [x] 페이지네이션 지원 (limit, offset)
+    - [x] 활성화된 상품만 조회 (`is_active = true`)
+    - [x] 최신순 정렬 (`created_at DESC`)
+    - [x] 에러 핸들링 및 로깅
+  - [x] `getProductsCount()` - 전체 상품 개수 조회
+    - [x] 카테고리별 개수 조회 지원
+    - [x] 페이지네이션 계산용
+  - [x] `getFeaturedProducts()` - 인기 상품 조회
+    - [x] 홈페이지용 인기 상품 조회
+    - [x] 개수 제한 설정 가능
   - [x] `getProductsByCategory(category)` - 카테고리별 조회
+    - [x] 특정 카테고리의 상품만 조회
+    - [x] 개수 제한 설정 가능
+  - [x] `getProductById(id)` - 상품 상세 조회
+    - [x] UUID 기반 단일 상품 조회
+    - [x] 활성화된 상품만 조회
+    - [x] null 반환 처리 (존재하지 않는 상품)
 
 ## Phase 3: 장바구니 & 주문 (1주)
 

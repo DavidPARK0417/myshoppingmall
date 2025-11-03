@@ -73,7 +73,7 @@ export default async function Home({ searchParams }: HomePageProps) {
           </p>
         </section>
 
-        {/* 인기 상품 섹션 */}
+        {/* 인기 상품 섹션 - 전체 상품 바로 위 */}
         <section className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl lg:text-3xl font-bold">인기 상품</h2>
