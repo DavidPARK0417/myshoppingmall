@@ -1,11 +1,14 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { RiSupabaseFill } from "react-icons/ri";
 import {
   getFeaturedProducts,
   getProductsByCategory,
+  getProducts,
 } from "@/actions/products";
 import ProductList from "@/components/product-list";
+import ProductCategoryFilter from "@/components/product-category-filter";
 import { getCategoryLabel, getFeaturedCategories } from "@/lib/categories";
 
 /**
@@ -14,23 +17,43 @@ import { getCategoryLabel, getFeaturedCategories } from "@/lib/categories";
  *
  * 인기 상품 및 카테고리별 상품 섹션을 표시하는 홈페이지입니다.
  * Server Component로 구현하여 데이터를 서버에서 조회합니다.
+ * URL 쿼리 파라미터를 통해 카테고리 필터링을 지원합니다.
  */
 
-export default async function Home() {
-  console.log("[home] 홈페이지 렌더링 시작");
+interface HomePageProps {
+  searchParams: Promise<{
+    category?: string;
+    showAll?: string;
+  }>;
+}
+
+export default async function Home({ searchParams }: HomePageProps) {
+  const params = await searchParams;
+  const category = params.category || undefined;
+  const showAll = params.showAll === "true"; // "전체" 버튼이 클릭되었는지 확인
+
+  console.log("[home] 홈페이지 렌더링 시작", { category, showAll });
+
+  // 카테고리가 선택되었거나 "전체" 버튼이 클릭된 경우에만 상품 조회
+  const shouldShowProducts = category || showAll;
 
   // 병렬로 데이터 조회
-  const [featuredProducts, ...categoryProducts] = await Promise.all([
-    getFeaturedProducts(8),
-    ...getFeaturedCategories().map((category) =>
-      getProductsByCategory(category, 4),
-    ),
-  ]);
+  const [featuredProducts, allProducts, ...categoryProducts] =
+    await Promise.all([
+      getFeaturedProducts(8),
+      shouldShowProducts
+        ? getProducts({ category, limit: 12 })
+        : Promise.resolve([]),
+      ...getFeaturedCategories().map((category) =>
+        getProductsByCategory(category, 4),
+      ),
+    ]);
 
   const categories = getFeaturedCategories();
 
   console.log("[home] 홈페이지 데이터 로드 완료", {
     featuredCount: featuredProducts.length,
+    allProductsCount: allProducts.length,
     categoryCounts: categoryProducts.map((products, i) => ({
       category: categories[i],
       count: products.length,
@@ -61,6 +84,32 @@ export default async function Home() {
             </Link>
           </div>
           <ProductList products={featuredProducts} />
+        </section>
+
+        {/* 전체 상품 섹션 */}
+        <section id="all-products" className="flex flex-col gap-6 scroll-mt-24">
+          <h1 className="text-3xl font-bold mb-8">전체 상품</h1>
+
+          {/* 카테고리 필터 */}
+          <Suspense fallback={<div>필터 로딩 중...</div>}>
+            <ProductCategoryFilter basePath="/" />
+          </Suspense>
+
+          {/* 필터링된 상품 목록 */}
+          {shouldShowProducts ? (
+            <ProductList
+              products={allProducts}
+              emptyMessage={
+                category
+                  ? `${getCategoryLabel(category)} 카테고리에 상품이 없습니다.`
+                  : "상품이 없습니다."
+              }
+            />
+          ) : (
+            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+              카테고리를 선택하여 상품을 확인하세요.
+            </div>
+          )}
         </section>
 
         {/* 카테고리별 섹션 */}
