@@ -8,7 +8,7 @@
 /**
  * 정렬 옵션 타입
  */
-export type SortOption = "latest" | "name" | "popular";
+export type SortOption = "latest" | "name" | "popular" | "price-asc" | "price-desc";
 
 /**
  * 정렬 옵션 라벨 매핑 (한국어)
@@ -17,6 +17,8 @@ export const SORT_LABELS: Record<SortOption, string> = {
   latest: "최신순",
   name: "이름순",
   popular: "인기순",
+  "price-asc": "낮은 가격순",
+  "price-desc": "높은 가격순",
 } as const;
 
 /**

@@ -63,34 +63,38 @@
   - [x] 상품 상세 페이지 링크
   - [x] 가격 포맷팅 (천 단위 구분)
   - [x] 재고 상태 표시 (재고 있음/부족/품절)
-- [ ] 상품 상세 페이지 (`app/products/[id]/page.tsx`)
-  - [ ] 페이지 기본 구조 및 레이아웃
-    - [ ] 상단 영역: 이름, 가격, 재고 상태 표시
-    - [ ] 중단 영역: 설명(description), 카테고리 표시
-    - [ ] 우측 고정 영역: 장바구니 UI (수량 선택, 장바구니 추가 버튼)
-    - [ ] 하단 영역: 등록일(created_at), 수정일(updated_at) 표시
-  - [ ] 상품 정보 표시
-    - [ ] 상품명 표시 (name)
-    - [ ] 가격 표시 (price, 천 단위 구분 포맷팅)
-    - [ ] 재고 상태 표시 (stock_quantity 기반, 재고 있음/부족/품절)
-    - [ ] 설명 표시 (description, null 처리)
-    - [ ] 카테고리 표시 (category, 한글 라벨 변환)
-    - [ ] 등록일 표시 (created_at, 날짜 포맷팅)
-    - [ ] 수정일 표시 (updated_at, 날짜 포맷팅)
-  - [ ] 수량 선택 기능
-    - [ ] 수량 입력 UI (증가/감소 버튼)
-    - [ ] 재고 범위 내 수량 제한 (최소 1개, 최대 stock_quantity)
-    - [ ] 수량 변경 시 재고 체크
-  - [ ] 장바구니 추가 버튼
+- [x] 상품 상세 페이지 (`app/products/[id]/page.tsx`)
+  - [x] 페이지 기본 구조 및 레이아웃
+    - [x] 상단 영역: 이름, 가격, 재고 상태 표시
+    - [x] 중단 영역: 설명(description), 카테고리 표시
+    - [x] 우측 고정 영역: 장바구니 UI (수량 선택, 장바구니 추가 버튼)
+    - [x] 하단 영역: 등록일(created_at), 수정일(updated_at) 표시
+  - [x] 상품 정보 표시
+    - [x] 상품명 표시 (name)
+    - [x] 가격 표시 (price, 천 단위 구분 포맷팅)
+    - [x] 재고 상태 표시 (stock_quantity 기반, 재고 있음/부족/품절)
+    - [x] 설명 표시 (description, null 처리)
+    - [x] 카테고리 표시 (category, 한글 라벨 변환)
+    - [x] 등록일 표시 (created_at, 날짜 포맷팅)
+    - [x] 수정일 표시 (updated_at, 날짜 포맷팅)
+  - [x] 수량 선택 기능
+    - [x] 수량 입력 UI (증가/감소 버튼) (`components/product-add-to-cart.tsx`)
+    - [x] 재고 범위 내 수량 제한 (최소 1개, 최대 stock_quantity)
+    - [x] 수량 변경 시 재고 체크
+  - [x] 장바구니 추가 버튼
     - [ ] 장바구니 추가 Server Action 호출 (Phase 3에서 구현 예정)
-    - [ ] 로딩 상태 처리
-    - [ ] 성공/실패 메시지 표시
-    - [ ] 재고 부족 시 버튼 비활성화
-  - [ ] Server Component 구현
-    - [ ] `params` 비동기 처리 (Next.js 15)
-    - [ ] `getProductById()` Server Action 사용
-    - [ ] 상품이 없을 경우 404 처리 (notFound())
-    - [ ] 로깅 추가 (개발 환경 디버깅용)
+    - [x] 로딩 상태 처리
+    - [x] 성공/실패 메시지 표시 (임시 alert 구현)
+    - [x] 재고 부족 시 버튼 비활성화
+  - [x] Server Component 구현
+    - [x] `params` 비동기 처리 (Next.js 15)
+    - [x] `getProductById()` Server Action 사용
+    - [x] 상품이 없을 경우 404 처리 (notFound())
+    - [x] 로깅 추가 (개발 환경 디버깅용)
+  - [x] 공통 유틸리티 함수 (`lib/product-utils.ts`)
+    - [x] `formatPrice()` - 가격 포맷팅
+    - [x] `getStockStatus()` - 재고 상태 반환
+    - [x] `formatDate()` - 날짜 포맷팅
   - [ ] 이미지 표시 (추후 Supabase Storage 연동 시 확장 가능)
 - [ ] 어드민 상품 등록
   - [ ] 참고: Supabase 대시보드에서 직접 등록 (MVP에서는 어드민 기능 제외)

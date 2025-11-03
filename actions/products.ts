@@ -70,6 +70,10 @@ export async function getProducts(options?: {
       query = query.order("created_at", { ascending: false });
     } else if (sortBy === "name") {
       query = query.order("name", { ascending: true });
+    } else if (sortBy === "price-asc") {
+      query = query.order("price", { ascending: true });
+    } else if (sortBy === "price-desc") {
+      query = query.order("price", { ascending: false });
     }
 
     // 카테고리 필터 적용
