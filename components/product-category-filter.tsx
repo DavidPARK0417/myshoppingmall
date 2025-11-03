@@ -1,9 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { getAllCategories, getCategoryLabel } from "@/lib/categories";
 import { cn } from "@/lib/utils";
 
@@ -12,7 +19,7 @@ import { cn } from "@/lib/utils";
  * @description 카테고리 필터 컴포넌트
  *
  * 상품 목록 페이지 또는 홈페이지에서 카테고리별로 필터링할 수 있는 UI 컴포넌트입니다.
- * 현재 선택된 카테고리를 강조 표시합니다.
+ * 상품 목록 페이지에서는 드롭다운 형식, 홈페이지에서는 버튼 형태로 표시됩니다.
  *
  * @param basePath - 필터링된 페이지의 기본 경로 (기본값: '/products')
  */
@@ -24,10 +31,12 @@ interface ProductCategoryFilterProps {
 export default function ProductCategoryFilter({
   basePath = "/products",
 }: ProductCategoryFilterProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCategory = searchParams.get("category");
   const categories = getAllCategories();
   const isHomePage = basePath === "/";
+  const isProductsPage = basePath === "/products";
   const hasScrolledRef = useRef(false);
 
   // 카테고리가 변경되었을 때 전체 상품 섹션으로 스크롤 (홈페이지에서만)
@@ -92,6 +101,61 @@ export default function ProductCategoryFilter({
     return `${basePath}?category=${category}`;
   };
 
+  // 드롭다운 카테고리 변경 핸들러 (상품 목록 페이지 전용)
+  const handleCategoryChange = (value: string) => {
+    console.log("[category-filter] 카테고리 변경", {
+      value,
+      basePath,
+      currentCategory: selectedCategory,
+    });
+
+    if (isProductsPage) {
+      // 상품 목록 페이지: URL 업데이트 (페이지는 1로 리셋)
+      if (value === "all") {
+        router.push(basePath);
+      } else {
+        router.push(`${basePath}?category=${value}`);
+      }
+    }
+  };
+
+  // 드롭다운 현재 값 (상품 목록 페이지 전용)
+  const dropdownValue = selectedCategory || "all";
+
+  // 드롭다운 형태 (상품 목록 페이지)
+  if (isProductsPage) {
+    return (
+      <div className="mb-8">
+        <div className="flex flex-col gap-2">
+          <label
+            htmlFor="category-select"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            카테고리
+          </label>
+          <Select value={dropdownValue} onValueChange={handleCategoryChange}>
+            <SelectTrigger
+              id="category-select"
+              className="w-full sm:w-[220px]"
+              aria-label="카테고리 선택"
+            >
+              <SelectValue placeholder="카테고리 선택" />
+            </SelectTrigger>
+            <SelectContent className="max-h-[300px]">
+              <SelectItem value="all">전체</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category} value={category}>
+                  {getCategoryLabel(category)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    );
+  }
+
+  // 버튼 형태 (홈페이지)
   return (
     <div className="flex flex-wrap gap-2 mb-8">
       {/* 전체 상품 버튼 */}
