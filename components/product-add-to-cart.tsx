@@ -1,10 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Product } from "@/types/product";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
+import { addToCart } from "@/actions/cart";
+import ProductAddToCartDialog from "@/components/product-add-to-cart-dialog";
 
 /**
  * @file product-add-to-cart.tsx
@@ -12,8 +16,6 @@ import { Minus, Plus, ShoppingCart } from "lucide-react";
  *
  * 상품 상세 페이지의 우측 고정 영역에 표시되는 장바구니 추가 UI입니다.
  * 수량 선택 및 장바구니 추가 기능을 제공합니다.
- *
- * 주의: Phase 3에서 장바구니 추가 Server Action이 구현되면 연동 예정
  */
 
 interface ProductAddToCartProps {
@@ -25,8 +27,11 @@ export default function ProductAddToCart({
   product,
   isOutOfStock,
 }: ProductAddToCartProps) {
+  const { isSignedIn } = useAuth();
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const maxQuantity = product.stock_quantity;
   const minQuantity = 1;
@@ -66,6 +71,13 @@ export default function ProductAddToCart({
   const handleAddToCart = async () => {
     if (isOutOfStock || isLoading) return;
 
+    // 로그인 확인
+    if (!isSignedIn) {
+      console.log("[product-add-to-cart] 로그인 필요");
+      router.push("/sign-in");
+      return;
+    }
+
     setIsLoading(true);
     console.log("[product-add-to-cart] 장바구니 추가 시작", {
       productId: product.id,
@@ -73,16 +85,22 @@ export default function ProductAddToCart({
     });
 
     try {
-      // TODO: Phase 3에서 장바구니 추가 Server Action 구현 예정
-      // await addToCart(product.id, quantity);
+      await addToCart(product.id, quantity);
 
-      // 임시: 성공 메시지 표시
-      alert(
-        `장바구니 추가 기능은 Phase 3에서 구현 예정입니다.\n\n상품: ${product.name}\n수량: ${quantity}개`,
-      );
+      console.log("[product-add-to-cart] 장바구니 추가 성공", {
+        productId: product.id,
+        quantity,
+      });
+
+      // Dialog 표시
+      setDialogOpen(true);
     } catch (error) {
       console.error("[product-add-to-cart] 장바구니 추가 오류:", error);
-      alert("장바구니 추가 중 오류가 발생했습니다.");
+      alert(
+        error instanceof Error
+          ? error.message
+          : "장바구니 추가 중 오류가 발생했습니다.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -93,6 +111,7 @@ export default function ProductAddToCart({
     quantity,
     isOutOfStock,
     maxQuantity,
+    isSignedIn,
   });
 
   return (
@@ -186,6 +205,15 @@ export default function ProductAddToCart({
           현재 재고가 없어 구매할 수 없습니다.
         </p>
       )}
+
+      {/* 장바구니 추가 완료 Dialog */}
+      <ProductAddToCartDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        productName={product.name}
+        quantity={quantity}
+        totalPrice={product.price * quantity}
+      />
     </div>
   );
 }
