@@ -55,9 +55,8 @@ export default function CheckoutFormHandler({
         totalAmount: order.total_amount,
       });
 
-      // 주문 완료 페이지로 이동 (Phase 4 결제 통합 전까지는 간단히 처리)
-      // TODO: Phase 4에서 결제 페이지로 이동하도록 변경
-      router.push(`/orders/${order.id}/success`);
+      // 결제 페이지로 이동
+      router.push(`/payment?orderId=${order.id}`);
     } catch (error) {
       console.error("[checkout-form-handler] 주문 생성 오류:", error);
       setError(

@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { getCartItemsCount } from "@/actions/cart";
@@ -19,33 +18,54 @@ import { getCartItemsCount } from "@/actions/cart";
 export default function CartIconButton() {
   const { isSignedIn, isLoaded } = useAuth();
   const router = useRouter();
-  const [itemCount, setItemCount] = useState<number | null>(null);
+  const pathname = usePathname();
+  const [itemCount, setItemCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 장바구니 아이템 개수 조회
-  useEffect(() => {
-    if (!isLoaded) return;
-
-    if (!isSignedIn) {
-      setItemCount(null);
+  // 장바구니 아이템 개수 조회 함수
+  const fetchCartCount = async () => {
+    if (!isLoaded || !isSignedIn) {
+      setItemCount(0);
       return;
     }
 
-    const fetchCartCount = async () => {
-      try {
-        setIsLoading(true);
-        const count = await getCartItemsCount();
-        setItemCount(count);
-        console.log("[cart-icon-button] 장바구니 개수 조회 완료", { count });
-      } catch (error) {
-        console.error("[cart-icon-button] 장바구니 개수 조회 오류:", error);
-        setItemCount(null);
-      } finally {
-        setIsLoading(false);
-      }
+    try {
+      setIsLoading(true);
+      const count = await getCartItemsCount();
+      setItemCount(count);
+      console.log("[cart-icon-button] 장바구니 개수 조회 완료", { count });
+    } catch (error) {
+      console.error("[cart-icon-button] 장바구니 개수 조회 오류:", error);
+      setItemCount(0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 초기 로드 및 로그인 상태 변경 시 조회
+  useEffect(() => {
+    fetchCartCount();
+  }, [isSignedIn, isLoaded]);
+
+  // 페이지 전환 시 갱신 (장바구니 페이지에서 돌아올 때 등)
+  useEffect(() => {
+    if (isSignedIn && isLoaded) {
+      fetchCartCount();
+    }
+  }, [pathname, isSignedIn, isLoaded]);
+
+  // 페이지 포커스 시 갱신 (다른 탭에서 돌아올 때)
+  useEffect(() => {
+    if (!isSignedIn || !isLoaded) return;
+
+    const handleFocus = () => {
+      fetchCartCount();
     };
 
-    fetchCartCount();
+    window.addEventListener("focus", handleFocus);
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
   }, [isSignedIn, isLoaded]);
 
   const handleClick = () => {
@@ -63,11 +83,11 @@ export default function CartIconButton() {
       size="icon"
       onClick={handleClick}
       className="relative"
-      aria-label="장바구니"
+      aria-label={`장바구니${itemCount > 0 ? ` (${itemCount}개)` : ""}`}
     >
       <ShoppingCart className="h-5 w-5" />
-      {isSignedIn && itemCount !== null && itemCount > 0 && (
-        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+      {isSignedIn && itemCount > 0 && (
+        <span className="absolute -top-1 -right-1 flex h-5 w-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow-sm">
           {itemCount > 99 ? "99+" : itemCount}
         </span>
       )}

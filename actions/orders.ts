@@ -132,7 +132,15 @@ export async function createOrder(
 
     if (orderItemsError || !orderItems) {
       console.error("[orders] 주문 상세 생성 오류:", orderItemsError);
-      // 주문이 생성되었으므로 주문을 삭제해야 하지만, MVP에서는 간단히 처리
+      // 주문 상세 생성 실패 시 주문 롤백
+      try {
+        await supabase.from("orders").delete().eq("id", newOrder.id);
+        console.log("[orders] 주문 롤백 완료 (주문 상세 생성 실패)", {
+          orderId: newOrder.id,
+        });
+      } catch (rollbackError) {
+        console.error("[orders] 주문 롤백 오류:", rollbackError);
+      }
       throw new Error("주문 상세 생성 실패");
     }
 
@@ -166,6 +174,10 @@ export async function createOrder(
     );
 
     await Promise.all(stockUpdatePromises);
+
+    console.log("[orders] 재고 감소 완료", {
+      itemCount: stockChecks.length,
+    });
 
     // 3-4. 장바구니 비우기
     await clearCart();

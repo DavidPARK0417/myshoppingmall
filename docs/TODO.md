@@ -141,15 +141,18 @@
   - [x] 장바구니 아이템 컴포넌트 (`components/cart-item.tsx`)
   - [x] 장바구니 요약 컴포넌트 (`components/cart-summary.tsx`)
   - [x] 빈 장바구니 상태 컴포넌트 (`components/empty-cart.tsx`)
-- [ ] 주문 프로세스 구현
-  - [ ] 주문 페이지 (`app/checkout/page.tsx`)
-  - [ ] 배송지 정보 입력 폼
-  - [ ] 주문 요약 (상품 목록, 총 금액)
-  - [ ] 주문 생성 Server Action (`actions/orders.ts` - `createOrder()`)
-- [ ] 주문 테이블 연동
-  - [ ] 주문 저장 (orders, order_items 테이블)
-  - [ ] 장바구니 비우기 (주문 완료 후)
-  - [ ] 재고 감소 처리 (products 테이블)
+- [x] 주문 프로세스 구현
+  - [x] 주문 페이지 (`app/checkout/page.tsx`)
+  - [x] 배송지 정보 입력 폼 (`components/shipping-address-form.tsx`)
+  - [x] 주문 요약 (상품 목록, 총 금액 - `components/checkout-order-summary.tsx`)
+  - [x] 주문 생성 Server Action (`actions/orders.ts` - `createOrder()`)
+  - [x] 주문 폼 핸들러 (`components/checkout-form-handler.tsx`)
+  - [x] 주문 성공 페이지 (`app/orders/[id]/success/page.tsx`)
+- [x] 주문 테이블 연동
+  - [x] 주문 저장 (orders, order_items 테이블)
+  - [x] 장바구니 비우기 (주문 완료 후)
+  - [x] 재고 감소 처리 (products 테이블)
+  - [x] 주문 실패 시 롤백 처리 (주문 상세 생성 실패 시 주문 삭제)
 
 ## Phase 4: 결제 통합 (1주)
 
