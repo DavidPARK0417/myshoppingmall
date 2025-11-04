@@ -11,6 +11,14 @@ const Navbar = () => {
         SaaS Template
       </Link>
       <div className="flex gap-4 items-center">
+        {/* 로그인한 사용자에게만 마이페이지 링크 표시 */}
+        <SignedIn>
+          <Link href="/my-page">
+            <Button variant="ghost" size="sm">
+              마이페이지
+            </Button>
+          </Link>
+        </SignedIn>
         {/* 장바구니 아이콘 (왼쪽에 배치) */}
         <SignedIn>
           <CartIconButton />

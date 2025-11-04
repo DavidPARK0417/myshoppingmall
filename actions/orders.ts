@@ -205,3 +205,150 @@ export async function createOrder(
     throw new Error("주문 생성 중 오류가 발생했습니다.");
   }
 }
+
+/**
+ * 현재 로그인한 사용자의 주문 목록 조회
+ * @returns 주문 목록 (주문 상세 아이템 포함)
+ */
+export async function getUserOrders(): Promise<OrderWithItems[]> {
+  try {
+    const clerkId = await getAuthenticatedUserId();
+
+    console.log("[orders] 사용자 주문 목록 조회 시작", { clerkId });
+
+    const supabase = getServiceRoleClient();
+
+    // 1. 주문 목록 조회
+    const { data: orders, error: ordersError } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("clerk_id", clerkId)
+      .order("created_at", { ascending: false });
+
+    if (ordersError) {
+      console.error("[orders] 주문 목록 조회 오류:", ordersError);
+      throw new Error("주문 목록 조회 실패");
+    }
+
+    if (!orders || orders.length === 0) {
+      console.log("[orders] 주문 목록 없음", { clerkId });
+      return [];
+    }
+
+    console.log("[orders] 주문 목록 조회 완료", {
+      clerkId,
+      orderCount: orders.length,
+    });
+
+    // 2. 각 주문의 상세 아이템 조회
+    const ordersWithItemsPromises = orders.map(async (order) => {
+      const { data: orderItems, error: orderItemsError } = await supabase
+        .from("order_items")
+        .select("*")
+        .eq("order_id", order.id)
+        .order("created_at", { ascending: true });
+
+      if (orderItemsError) {
+        console.error(
+          `[orders] 주문 상세 조회 오류 (orderId: ${order.id}):`,
+          orderItemsError,
+        );
+        // 주문 상세 조회 실패해도 주문은 반환 (빈 배열로)
+        return {
+          ...(order as Order),
+          order_items: [] as OrderItem[],
+        };
+      }
+
+      return {
+        ...(order as Order),
+        order_items: (orderItems || []) as OrderItem[],
+      };
+    });
+
+    const ordersWithItems = await Promise.all(ordersWithItemsPromises);
+
+    console.log("[orders] 주문 목록 및 상세 조회 완료", {
+      clerkId,
+      orderCount: ordersWithItems.length,
+    });
+
+    return ordersWithItems;
+  } catch (error) {
+    console.error("[orders] getUserOrders 오류:", error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("주문 목록 조회 중 오류가 발생했습니다.");
+  }
+}
+
+/**
+ * 특정 주문 상세 조회
+ * @param orderId - 주문 ID
+ * @returns 주문 정보 (주문 상세 아이템 포함), 주문이 없거나 권한이 없으면 null
+ */
+export async function getOrderById(
+  orderId: string,
+): Promise<OrderWithItems | null> {
+  try {
+    const clerkId = await getAuthenticatedUserId();
+
+    console.log("[orders] 주문 상세 조회 시작", { clerkId, orderId });
+
+    const supabase = getServiceRoleClient();
+
+    // 1. 주문 조회 (권한 확인 포함)
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("id", orderId)
+      .eq("clerk_id", clerkId)
+      .single();
+
+    if (orderError || !order) {
+      console.log("[orders] 주문 조회 실패 또는 권한 없음", {
+        clerkId,
+        orderId,
+        error: orderError,
+      });
+      return null;
+    }
+
+    console.log("[orders] 주문 조회 완료", {
+      clerkId,
+      orderId: order.id,
+    });
+
+    // 2. 주문 상세 아이템 조회
+    const { data: orderItems, error: orderItemsError } = await supabase
+      .from("order_items")
+      .select("*")
+      .eq("order_id", orderId)
+      .order("created_at", { ascending: true });
+
+    if (orderItemsError) {
+      console.error("[orders] 주문 상세 조회 오류:", orderItemsError);
+      throw new Error("주문 상세 조회 실패");
+    }
+
+    const orderWithItems: OrderWithItems = {
+      ...(order as Order),
+      order_items: (orderItems || []) as OrderItem[],
+    };
+
+    console.log("[orders] 주문 상세 조회 완료", {
+      clerkId,
+      orderId: orderWithItems.id,
+      itemCount: orderWithItems.order_items.length,
+    });
+
+    return orderWithItems;
+  } catch (error) {
+    console.error("[orders] getOrderById 오류:", error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("주문 상세 조회 중 오류가 발생했습니다.");
+  }
+}

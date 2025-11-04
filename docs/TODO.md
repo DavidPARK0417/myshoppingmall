@@ -156,32 +156,52 @@
 
 ## Phase 4: 결제 통합 (1주)
 
-- [ ] Toss Payments MCP 연동
-  - [ ] 환경 변수 설정 (Toss Payments API 키)
-  - [ ] 결제 위젯 설치 및 설정
-- [ ] 테스트 결제 구현
-  - [ ] 결제 요청 페이지 (`app/payment/page.tsx`)
-  - [ ] 결제 위젯 연동
-  - [ ] 테스트 카드 정보 입력 가이드
-- [ ] 결제 완료 후 주문 저장
-  - [ ] 결제 성공 콜백 처리
-  - [ ] 결제 정보를 orders 테이블에 저장
-  - [ ] 결제 실패 처리
-- [ ] 결제 검증
-  - [ ] 결제 금액 검증 (주문 금액과 일치 확인)
-  - [ ] 중복 결제 방지
+- [x] Toss Payments MCP 연동
+  - [x] 환경 변수 설정 (Toss Payments API 키)
+    - [x] `.env.example`에 `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY` 추가
+  - [x] 결제 위젯 설치 및 설정
+    - [x] `@tosspayments/payment-widget-sdk` 패키지 설치
+    - [x] 결제위젯 컴포넌트 구현 (`components/payment-widget.tsx`)
+- [x] 테스트 결제 구현
+  - [x] 결제 요청 페이지 (`app/payment/page.tsx`)
+    - [x] 주문 정보 조회 및 표시
+    - [x] 결제위젯 렌더링
+  - [x] 결제 위젯 연동
+    - [x] Toss Payments v1 SDK 초기화
+    - [x] 결제 UI 및 이용약관 UI 렌더링
+    - [x] `requestPayment()` 메서드 호출
+  - [x] 테스트 카드 정보 입력 가이드
+    - [x] 결제위젯 컴포넌트에 테스트 안내 표시
+- [x] 결제 완료 후 주문 저장
+  - [x] 결제 성공 콜백 처리 (`app/payment/success/page.tsx`)
+    - [x] 쿼리 파라미터에서 `paymentKey`, `orderId`, `amount` 추출
+    - [x] 결제 승인 API 호출 (`actions/payment.ts` - `confirmPayment()`)
+    - [x] 주문 상태 `confirmed`로 업데이트 (`actions/payment.ts` - `updateOrderStatus()`)
+  - [x] 결제 정보를 orders 테이블에 저장
+    - [x] 주문 상태를 `pending`에서 `confirmed`로 업데이트
+  - [x] 결제 실패 처리 (`app/payment/fail/page.tsx`)
+    - [x] 에러 코드 및 메시지 표시
+    - [x] 사용자 친화적 에러 메시지
+    - [x] 재시도 옵션 제공
+- [x] 결제 검증
+  - [x] 결제 금액 검증 (주문 금액과 일치 확인)
+    - [x] 결제 승인 시 요청 금액과 응답 금액 비교
+    - [x] 금액 불일치 시 에러 처리
+  - [x] 중복 결제 방지
+    - [x] 주문 상태가 `pending`인 경우에만 결제 진행 가능
+    - [x] 결제 승인 후 상태를 `confirmed`로 업데이트하여 중복 결제 방지
 
 ## Phase 5: 마이페이지 (0.5주)
 
-- [ ] 주문 내역 조회
-  - [ ] 마이페이지 (`app/my-page/page.tsx`)
-  - [ ] 주문 목록 표시 (Server Action: `actions/orders.ts` - `getUserOrders()`)
-  - [ ] 주문 상태 표시 (pending, confirmed, shipped, delivered, cancelled)
-- [ ] 주문 상세 보기
-  - [ ] 주문 상세 페이지 (`app/my-page/orders/[id]/page.tsx`)
-  - [ ] 주문 상세 정보 조회 (Server Action: `actions/orders.ts` - `getOrderById()`)
-  - [ ] 주문 상품 목록 표시
-  - [ ] 배송지 정보 표시
+- [x] 주문 내역 조회
+  - [x] 마이페이지 (`app/my-page/page.tsx`)
+  - [x] 주문 목록 표시 (Server Action: `actions/orders.ts` - `getUserOrders()`)
+  - [x] 주문 상태 표시 (pending, confirmed, shipped, delivered, cancelled)
+- [x] 주문 상세 보기
+  - [x] 주문 상세 페이지 (`app/my-page/orders/[id]/page.tsx`)
+  - [x] 주문 상세 정보 조회 (Server Action: `actions/orders.ts` - `getOrderById()`)
+  - [x] 주문 상품 목록 표시
+  - [x] 배송지 정보 표시
 
 ## Phase 6: 테스트 & 배포 (0.5주)
 
